@@ -12,7 +12,6 @@ import numpy as np
 
 ROOT = Path(__file__).parent
 SR = 44100
-BEAT = 60 / 66  # slow tempo
 
 NOTE = {n: i for i, n in enumerate("C C# D D# E F F# G G# A A# B".split())}
 
@@ -35,12 +34,17 @@ def pad(fs, dur):
     return 0.12 * tone * env
 
 
-# (chords as (root, minor?)) per track; each chord lasts 4 beats.
+# name: (folder, tempo, notes per beat, chords as (root, minor?)); each chord lasts 4 beats.
+# sad/ is used for sad quotes, uplifting/ for motivation, inspiring and life quotes.
 TRACKS = {
-    "rain-piano": ("A", [("A", 1), ("F", 0), ("C", 0), ("G", 0)]),
-    "night-thoughts": ("E", [("E", 1), ("C", 0), ("G", 0), ("D", 0)]),
-    "letting-go": ("D", [("D", 1), ("A#", 0), ("F", 0), ("C", 0)]),
-    "quiet-heart": ("C", [("C", 0), ("A", 1), ("F", 0), ("G", 0)]),
+    "rain-piano": ("sad", 66, 1, [("A", 1), ("F", 0), ("C", 0), ("G", 0)]),
+    "night-thoughts": ("sad", 66, 1, [("E", 1), ("C", 0), ("G", 0), ("D", 0)]),
+    "letting-go": ("sad", 66, 1, [("D", 1), ("A#", 0), ("F", 0), ("C", 0)]),
+    "quiet-heart": ("sad", 66, 1, [("C", 0), ("A", 1), ("F", 0), ("G", 0)]),
+    "new-morning": ("uplifting", 96, 2, [("C", 0), ("G", 0), ("A", 1), ("F", 0)]),
+    "rise-again": ("uplifting", 100, 2, [("D", 0), ("A", 0), ("B", 1), ("G", 0)]),
+    "keep-going": ("uplifting", 92, 2, [("G", 0), ("D", 0), ("E", 1), ("C", 0)]),
+    "golden-hour": ("uplifting", 88, 2, [("F", 0), ("C", 0), ("D", 1), ("A#", 0)]),
 }
 
 
@@ -50,10 +54,11 @@ def chord_notes(root, minor):
     return [list(NOTE)[(r + i) % 12] for i in (0, third, 7)]
 
 
-def render(name, chords, seed):
+def render(name, folder, bpm, per_beat, chords, seed):
     rng = np.random.default_rng(seed)
-    bar = 4 * BEAT
-    total = bar * len(chords) * 2  # two passes, ~29s
+    beat_len = 60 / bpm
+    bar = 4 * beat_len
+    total = bar * len(chords) * 2  # two passes
     out = np.zeros(int(SR * (total + 3)))
     for rep in range(2):
         for ci, (root, minor) in enumerate(chords):
@@ -65,14 +70,21 @@ def render(name, chords, seed):
             # Bass note, then a gentle broken-chord melody.
             b = piano(freq(root, 2), bar, 0.35)
             out[i:i + len(b)] += b
-            pattern = [0, 1, 2, 1] if rep == 0 else [2, 1, 0, 2]
-            for beat, idx in enumerate(pattern):
-                octave = 4 + (1 if idx == 2 and rng.random() < 0.4 else 0)
-                n = piano(freq(notes[idx], octave), 2.5, 0.22 + 0.06 * rng.random())
-                j = int(SR * (start + beat * BEAT))
+            if per_beat == 1:
+                pattern = [0, 1, 2, 1] if rep == 0 else [2, 1, 0, 2]
+            else:  # brighter rising arpeggio
+                pattern = [0, 1, 2, 3, 2, 1, 2, 3] if rep == 0 else [0, 2, 3, 2, 1, 2, 3, 3]
+            step = beat_len / per_beat
+            for k, idx in enumerate(pattern):
+                name_, octave = (notes[0], 5) if idx == 3 else (notes[idx], 4)
+                if per_beat == 1 and idx == 2 and rng.random() < 0.4:
+                    octave = 5
+                n = piano(freq(name_, octave), 2.5, 0.22 + 0.06 * rng.random())
+                j = int(SR * (start + k * step))
                 out[j:j + len(n)] += n
     out /= np.abs(out).max() * 1.1
-    tmp = ROOT / "music" / f"{name}.wav"
+    tmp = ROOT / "music" / folder / f"{name}.wav"
+    tmp.parent.mkdir(parents=True, exist_ok=True)
     with wave.open(str(tmp), "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)
@@ -81,12 +93,12 @@ def render(name, chords, seed):
     # Reverb + gentle low-pass for a soft, distant feel, then stereo mp3.
     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-i", str(tmp),
                     "-af", "aecho=0.8:0.7:60|120|240:0.35|0.25|0.15,lowpass=f=5000,"
-                           "afade=out:st=26:d=4,volume=1.6",
+                           f"afade=out:st={total - 1:.1f}:d=4,volume=1.6",
                     "-ac", "2", "-b:a", "160k", str(tmp.with_suffix(".mp3"))], check=True)
     tmp.unlink()
 
 
 if __name__ == "__main__":
-    for seed, (name, (_, chords)) in enumerate(TRACKS.items()):
-        render(name, chords, seed)
+    for seed, (name, spec) in enumerate(TRACKS.items()):
+        render(name, *spec, seed)
         print("made", name)

@@ -169,9 +169,10 @@ def text_layer(quote, lang):
     return layer
 
 
-def render(quote, out, lang="en", seed=None, bg=None):
+def render(quote, out, lang="en", seed=None, bg=None, mood="sad"):
     rng = random.Random(seed)
-    music = pick("music", {".mp3", ".m4a", ".wav", ".aac"}, rng)
+    exts = {".mp3", ".m4a", ".wav", ".aac"}
+    music = pick(f"music/{'sad' if mood == 'sad' else 'uplifting'}", exts, rng) or pick("music", exts, rng)
     with tempfile.TemporaryDirectory() as tmp:
         bg_path, txt_path = Path(tmp) / "bg.png", Path(tmp) / "text.png"
         darken(load_background(rng, bg)).save(bg_path)
@@ -210,5 +211,6 @@ if __name__ == "__main__":
     ap.add_argument("--lang", default="en", choices=FONTS)
     ap.add_argument("--seed", type=int)
     ap.add_argument("--bg", help="background image to use instead of backgrounds/")
+    ap.add_argument("--mood", default="sad", help="sad, motivation, inspiring or life")
     a = ap.parse_args()
-    render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg)
+    render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg, a.mood)

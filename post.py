@@ -22,11 +22,20 @@ ROOT = Path(__file__).parent
 QUOTES = ROOT / "quotes.csv"
 API = "https://graph.instagram.com/v23.0"
 
-CTA = "Tag someone who needs to read this 🤍\nFollow @betweenyour.thoughts for more"
-HASHTAGS = {
-    "en": "#sadquotes #heartbreak #selfworth #healing #deepthoughts #quotes #reels",
-    "te": "#teluguquotes #telugu #telugusadquotes #telugulovequotes #sadquotes #reels",
+FOLLOW = "Follow @betweenyour.thoughts for more"
+CTA = {
+    "sad": "Tag someone who needs to read this 🤍",
+    "motivation": "Save this for the days you feel like giving up 💪",
+    "inspiring": "Share this with someone who needs a little hope ✨",
+    "life": "Save this and read it again in a year 📌",
 }
+HASHTAGS = {
+    "sad": "#sadquotes #heartbreak #selfworth #healing #deepthoughts",
+    "motivation": "#motivation #motivationalquotes #discipline #selfgrowth #nevergiveup",
+    "inspiring": "#inspiration #inspirationalquotes #hope #positivevibes #keepgoing",
+    "life": "#lifequotes #lifelessons #wisdom #mindset #deepthoughts",
+}
+TELUGU_TAGS = "#teluguquotes #telugu #telugumotivation"
 
 
 def api(method, path, **params):
@@ -64,6 +73,7 @@ def main():
     i = todo[0]
     row = rows[i]
     lang = row["lang"].strip() or "en"
+    mood = row.get("mood", "").strip() or "sad"
 
     # Today's background (made by Chandu in ChatGPT) goes in incoming/; it's used once.
     todays = sorted((ROOT / "incoming").glob("*.[jp][pn]g")) + sorted((ROOT / "incoming").glob("*.jpeg"))
@@ -72,7 +82,7 @@ def main():
         sys.exit("No image in incoming/ for today's reel.")
 
     video = Path("reels") / f"{i + 1:03d}.mp4"
-    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg)
+    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood)
     if bg is not None and os.environ.get("DRY_RUN") != "1":
         used = ROOT / "backgrounds" / "used" / f"{i + 1:03d}{bg.suffix}"
         used.parent.mkdir(parents=True, exist_ok=True)
@@ -86,7 +96,8 @@ def main():
     quote = row["text"].replace("\\n", "\n")
     heading = row.get("heading", "").strip()
     caption = row["caption"].strip() or (f"{heading}\n\n“{quote}”" if heading else quote)
-    caption = f"{caption}\n\n{CTA}\n\n{HASHTAGS.get(lang, HASHTAGS['en'])}"
+    tags = HASHTAGS.get(mood, HASHTAGS["sad"]) + (f" {TELUGU_TAGS}" if lang == "te" else "") + " #quotes #reels"
+    caption = f"{caption}\n\n{CTA.get(mood, CTA['sad'])}\n{FOLLOW}\n\n{tags}"
     branch = subprocess.run(["git", "branch", "--show-current"], capture_output=True,
                             text=True, cwd=ROOT).stdout.strip()
     video_url = f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/{branch}/{video.as_posix()}"
