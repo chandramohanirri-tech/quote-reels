@@ -7,9 +7,14 @@ Backgrounds come from backgrounds/ (jpg/png), music from music/ (mp3/m4a/wav).
 If either folder is empty, a moody gradient / silent track is used instead.
 """
 import argparse
+import io
+import os
 import random
 import subprocess
+import sys
 import tempfile
+import urllib.parse
+import urllib.request
 from pathlib import Path
 
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -25,6 +30,24 @@ FONTS = {
     "te": ROOT / "fonts" / "NotoSansTelugu-Medium.ttf",
 }
 WATERMARK_FONT = ROOT / "fonts" / "NotoSerif-Italic.ttf"
+
+# Used when backgrounds/ is empty and AI_BACKGROUNDS=1.
+AI_STYLE = ("moody cinematic photo, dark, soft light, film grain, melancholic, "
+            "lots of empty space in the middle, no text, no people facing camera")
+AI_SCENES = [
+    "rain drops on a window at night with blurred city lights",
+    "lonely figure in a hoodie seen from behind, looking at a sunset over the sea",
+    "empty street at night under a single streetlight in the rain",
+    "open old book and a cup of tea by a rainy window",
+    "silhouette of a person sitting alone on a rooftop at dusk",
+    "dark cloudy sky with a faint orange sunset over fields",
+    "dried rose petals on an old wooden table in dim light",
+    "empty bench in a park in the fog",
+    "candle burning in a dark room, warm glow",
+    "crescent moon over calm dark water",
+    "handwritten letter and faded photograph on a table, low light",
+    "train window view at night with rain streaks",
+]
 
 # Dark, moody gradient pairs used when backgrounds/ is empty.
 PALETTES = [
@@ -57,11 +80,28 @@ def gradient_background(rng):
     return img
 
 
+def ai_background(rng):
+    """Fresh AI image from the free Pollinations API (no key). None if it fails."""
+    scene = rng.choice(AI_SCENES)
+    prompt = urllib.parse.quote(f"{scene}, {AI_STYLE}")
+    url = (f"https://image.pollinations.ai/prompt/{prompt}"
+           f"?width={W}&height={H}&seed={rng.randint(1, 10**6)}&nologo=true&model=flux")
+    try:
+        with urllib.request.urlopen(url, timeout=120) as r:
+            return Image.open(io.BytesIO(r.read())).convert("RGB")
+    except Exception as e:
+        print(f"AI background failed ({e}), falling back", file=sys.stderr)
+        return None
+
+
 def load_background(rng):
     path = pick("backgrounds", {".jpg", ".jpeg", ".png", ".webp"}, rng)
-    if path is None:
-        return gradient_background(rng)
-    img = Image.open(path).convert("RGB")
+    if path is not None:
+        img = Image.open(path).convert("RGB")
+    else:
+        img = ai_background(rng) if os.environ.get("AI_BACKGROUNDS") == "1" else None
+        if img is None:
+            return gradient_background(rng)
     # Cover-crop to 9:16.
     scale = max(W / img.width, H / img.height)
     img = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
