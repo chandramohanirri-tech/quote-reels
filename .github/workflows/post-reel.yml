@@ -1,0 +1,43 @@
+name: Post daily reel
+
+on:
+  schedule:
+    - cron: "30 14 * * *" # 8:00 PM IST every day
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Only render the reel, don't post it"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency: post-reel
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install ffmpeg and text shaping
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q ffmpeg libraqm0
+          pip install -q pillow
+          python -c "from PIL import features; assert features.check('raqm'), 'Telugu shaping missing'"
+      - name: Render and post
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
+        run: |
+          git config user.name "reel-bot"
+          git config user.email "reel-bot@users.noreply.github.com"
+          python post.py
+      - name: Keep the rendered reel as a download
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reel
+          path: reels/*.mp4
+          if-no-files-found: ignore
