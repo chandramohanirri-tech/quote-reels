@@ -13,7 +13,7 @@ Posts one quote reel a day to @betweenyour.thoughts, for free, using GitHub Acti
 
 - **Quotes:** add rows to `quotes.csv`. `lang` is `en` or `te`. `caption` is optional; if it's empty, the quote is used. Write `\n` in the text for a line break.
 - **Backgrounds:** put moody `.jpg`/`.png` images in `backgrounds/`. Each reel picks one. If the folder is empty, a dark gradient is used.
-- **Music:** put royalty-free tracks (Pixabay Music, YouTube Audio Library) in `music/`. If the folder is empty, the reel is silent.
+- **Music:** `music/` starts with four soft piano tracks made by `make_music.py` (original, copyright-free). Add royalty-free tracks (Pixabay Music, YouTube Audio Library) in `music/`. If the folder is empty, the reel is silent.
 
 ## Secrets (Settings → Secrets and variables → Actions)
 
