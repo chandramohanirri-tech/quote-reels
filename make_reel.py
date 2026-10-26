@@ -10,6 +10,7 @@ import argparse
 import io
 import os
 import random
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -32,6 +33,17 @@ FONTS = {
 }
 WATERMARK_FONT = ROOT / "fonts" / "NotoSerif-Italic.ttf"
 MINIMAL_FONT = ROOT / "fonts" / "Inter-Medium.otf"
+
+
+def find_ffmpeg():
+    # System ffmpeg if present, else the static build from the imageio-ffmpeg pip package.
+    if shutil.which("ffmpeg"):
+        return "ffmpeg"
+    import imageio_ffmpeg
+    return imageio_ffmpeg.get_ffmpeg_exe()
+
+
+FFMPEG = find_ffmpeg()
 
 # Used when backgrounds/ is empty and AI_BACKGROUNDS=1.
 AI_STYLE = ("moody cinematic photo, dark, soft light, film grain, melancholic, "
@@ -222,7 +234,7 @@ def render(quote, out, lang="en", seed=None, bg=None, mood="sad", music=None, st
             f"[1:v]format=rgba,fade=in:st=0.6:d=1.2:alpha=1[txt];"
             f"[bg][txt]overlay=0:0,fade=out:st={DURATION - 0.6}:d=0.6,format=yuv420p[v]"
         )
-        cmd = ["ffmpeg", "-y", "-loglevel", "error",
+        cmd = [FFMPEG, "-y", "-loglevel", "error",
                "-loop", "1", "-i", str(bg_path),
                "-loop", "1", "-i", str(txt_path)]
         if music:

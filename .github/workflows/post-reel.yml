@@ -19,16 +19,10 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Install ffmpeg and text shaping
+      - name: Install Python packages
         timeout-minutes: 6
-        run: |
-          # Skip the slow package index refresh when ffmpeg is already on the runner.
-          if ! command -v ffmpeg >/dev/null || ! ldconfig -p | grep -q libraqm; then
-            sudo apt-get update -q -o Acquire::Retries=3
-            sudo apt-get install -y -q --no-install-recommends ffmpeg libraqm0
-          fi
-          pip install -q pillow
-          python -c "from PIL import features; assert features.check('raqm'), 'Telugu shaping missing'"
+        # imageio-ffmpeg ships a ready-made ffmpeg, so no slow apt-get is needed.
+        run: pip install -q pillow imageio-ffmpeg numpy
       - name: Render and post
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
