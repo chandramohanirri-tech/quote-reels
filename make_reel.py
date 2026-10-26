@@ -88,13 +88,13 @@ def ai_background(rng):
     url = (f"https://image.pollinations.ai/prompt/{prompt}"
            f"?width={W}&height={H}&seed={rng.randint(1, 10**6)}&nologo=true&model=flux")
     # The free tier is busy at times and allows 1 image per 45s, so retry patiently.
-    for attempt in range(8):
+    for attempt in range(3):
         try:
             with urllib.request.urlopen(url, timeout=120) as r:
                 return Image.open(io.BytesIO(r.read())).convert("RGB")
         except Exception as e:
             print(f"AI background attempt {attempt + 1} failed ({e})", file=sys.stderr)
-            time.sleep(50)
+            time.sleep(30)
     print("AI background unavailable, falling back", file=sys.stderr)
     return None
 
