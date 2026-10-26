@@ -65,15 +65,27 @@ def main():
     row = rows[i]
     lang = row["lang"].strip() or "en"
 
+    # Today's background (made by Chandu in ChatGPT) goes in incoming/; it's used once.
+    todays = sorted((ROOT / "incoming").glob("*.[jp][pn]g")) + sorted((ROOT / "incoming").glob("*.jpeg"))
+    bg = todays[0] if todays else None
+    if bg is None and os.environ.get("REQUIRE_IMAGE") == "1":
+        sys.exit("No image in incoming/ for today's reel.")
+
     video = Path("reels") / f"{i + 1:03d}.mp4"
-    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i)
+    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg)
+    if bg is not None and os.environ.get("DRY_RUN") != "1":
+        used = ROOT / "backgrounds" / "used" / f"{i + 1:03d}{bg.suffix}"
+        used.parent.mkdir(parents=True, exist_ok=True)
+        bg.rename(used)
     push(f"Render reel {video.name}")
 
     if os.environ.get("DRY_RUN") == "1":
         print(f"Dry run: rendered {video}, not posting.")
         return
 
-    caption = row["caption"].strip() or row["text"].replace("\\n", "\n")
+    quote = row["text"].replace("\\n", "\n")
+    heading = row.get("heading", "").strip()
+    caption = row["caption"].strip() or (f"{heading}\n\n“{quote}”" if heading else quote)
     caption = f"{caption}\n\n{CTA}\n\n{HASHTAGS.get(lang, HASHTAGS['en'])}"
     branch = subprocess.run(["git", "branch", "--show-current"], capture_output=True,
                             text=True, cwd=ROOT).stdout.strip()

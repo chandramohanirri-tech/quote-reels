@@ -99,8 +99,8 @@ def ai_background(rng):
     return None
 
 
-def load_background(rng):
-    path = pick("backgrounds", {".jpg", ".jpeg", ".png", ".webp"}, rng)
+def load_background(rng, path=None):
+    path = path or pick("backgrounds", {".jpg", ".jpeg", ".png", ".webp"}, rng)
     if path is not None:
         img = Image.open(path).convert("RGB")
     else:
@@ -169,12 +169,12 @@ def text_layer(quote, lang):
     return layer
 
 
-def render(quote, out, lang="en", seed=None):
+def render(quote, out, lang="en", seed=None, bg=None):
     rng = random.Random(seed)
     music = pick("music", {".mp3", ".m4a", ".wav", ".aac"}, rng)
     with tempfile.TemporaryDirectory() as tmp:
         bg_path, txt_path = Path(tmp) / "bg.png", Path(tmp) / "text.png"
-        darken(load_background(rng)).save(bg_path)
+        darken(load_background(rng, bg)).save(bg_path)
         text_layer(quote, lang).save(txt_path)
 
         frames = int(DURATION * FPS)
@@ -209,5 +209,6 @@ if __name__ == "__main__":
     ap.add_argument("out")
     ap.add_argument("--lang", default="en", choices=FONTS)
     ap.add_argument("--seed", type=int)
+    ap.add_argument("--bg", help="background image to use instead of backgrounds/")
     a = ap.parse_args()
-    render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed)
+    render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg)
