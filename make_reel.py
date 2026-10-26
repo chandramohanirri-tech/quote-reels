@@ -149,7 +149,9 @@ def text_layer(quote, lang):
         font = ImageFont.truetype(str(FONTS[lang]), size)
         lines = wrap(quote, font, draw, max_width)
         line_h = int(size * (1.45 if lang == "en" else 1.7))
-        if len(lines) * line_h <= H * 0.42 or size <= 44:
+        # With manual line breaks, shrink until no line has to wrap again.
+        fits_breaks = "\n" not in quote or len(lines) == quote.count("\n") + 1
+        if (len(lines) * line_h <= H * 0.42 and fits_breaks) or size <= 44:
             break
         size -= 4
     y = int(H * 0.45 - len(lines) * line_h / 2)
