@@ -81,12 +81,18 @@ def main():
     if bg is None and os.environ.get("REQUIRE_IMAGE") == "1":
         sys.exit("No image in incoming/ for today's reel.")
 
+    # Optional track for today (e.g. picked by Chandu on Pixabay); also used once.
+    tracks = [p for p in sorted((ROOT / "incoming").glob("*")) if p.suffix.lower() in {".mp3", ".m4a", ".wav"}]
+    track = tracks[0] if tracks else None
+
     video = Path("reels") / f"{i + 1:03d}.mp4"
-    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood)
-    if bg is not None and os.environ.get("DRY_RUN") != "1":
-        used = ROOT / "backgrounds" / "used" / f"{i + 1:03d}{bg.suffix}"
-        used.parent.mkdir(parents=True, exist_ok=True)
-        bg.rename(used)
+    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood, music=track)
+    if os.environ.get("DRY_RUN") != "1":
+        for f, folder in ((bg, "backgrounds"), (track, "music")):
+            if f is not None:
+                used = ROOT / folder / "used" / f"{i + 1:03d}{f.suffix}"
+                used.parent.mkdir(parents=True, exist_ok=True)
+                f.rename(used)
     push(f"Render reel {video.name}")
 
     if os.environ.get("DRY_RUN") == "1":
