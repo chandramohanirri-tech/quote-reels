@@ -13,6 +13,7 @@ import random
 import subprocess
 import sys
 import tempfile
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -86,12 +87,16 @@ def ai_background(rng):
     prompt = urllib.parse.quote(f"{scene}, {AI_STYLE}")
     url = (f"https://image.pollinations.ai/prompt/{prompt}"
            f"?width={W}&height={H}&seed={rng.randint(1, 10**6)}&nologo=true&model=flux")
-    try:
-        with urllib.request.urlopen(url, timeout=120) as r:
-            return Image.open(io.BytesIO(r.read())).convert("RGB")
-    except Exception as e:
-        print(f"AI background failed ({e}), falling back", file=sys.stderr)
-        return None
+    # The free tier is busy at times and allows 1 image per 45s, so retry patiently.
+    for attempt in range(8):
+        try:
+            with urllib.request.urlopen(url, timeout=120) as r:
+                return Image.open(io.BytesIO(r.read())).convert("RGB")
+        except Exception as e:
+            print(f"AI background attempt {attempt + 1} failed ({e})", file=sys.stderr)
+            time.sleep(50)
+    print("AI background unavailable, falling back", file=sys.stderr)
+    return None
 
 
 def load_background(rng):
