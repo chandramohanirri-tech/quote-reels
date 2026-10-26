@@ -1,60 +1,61 @@
-text,lang,mood,heading,caption,posted_at
-Some silences hurt more than words ever could.,en,sad,Silence says what words can't 🌧,,2026-10-26 06:39 UTC
-I didn't lose you.\nI lost the version of me\nthat kept begging\nyou to stay.,en,sad,The day I stopped begging 🖤,,
-"The sun rises every day, no matter how dark the night was.",en,inspiring,Morning reminder ☀️,,
-Comparison is the thief of joy.,en,life,Stop comparing 🌿,,
-Nobody is coming to save you. Get up and save yourself.,en,motivation,Your wake-up call ⏰,,
-Stop watering people who never let you grow.,en,sad,Read this twice 🌱,,
-You've survived every bad day so far. You'll survive this one too.,en,inspiring,You're stronger than you think ✨,,
-Not every closed door is locked. Some just need a push.,en,life,Push the door 🚪,,
-Your future self is watching you right now. Make them proud.,en,motivation,Do it for future you 🔥,,
-You weren't too much. They just weren't enough.,en,sad,For the ones who were 'too much' 🤍,,
-Bloom where nobody expected you to grow.,en,inspiring,Bloom anyway 🌸,,
-"The quieter you become, the more you can hear.",en,life,Listen to the silence 🍃,,
-Small steps every day still count as moving forward.,en,motivation,"Progress, not perfection 👣",,
-Healing is quiet. Nobody claps for it.,en,sad,Quiet healing 🕯,,
-Your story isn't over. This is just a hard chapter.,en,inspiring,Keep turning the pages 📖,,
-Be kind. Everyone is fighting a battle you know nothing about.,en,life,Just be kind 🤍,,
-Be the person who didn't give up.,en,motivation,Don't quit 💪,,
-I miss who I thought you were.,en,sad,Missing a version of you 🥀,,
-Stars can't shine without darkness.,en,inspiring,Shine through it ⭐,,
-Some people grow up. Some people just grow older.,en,life,"Grow, don't just age 🌱",,
-Doubt kills more dreams than failure ever will.,en,motivation,Stop doubting yourself 🚀,,
-Being ignored by someone you'd never ignore is its own kind of heartbreak.,en,sad,The heartbreak no one talks about 💔,,
-You can be a masterpiece and a work in progress at the same time.,en,inspiring,"Both, always 🎨",,
-Life is too short to wait for perfect moments. Make them.,en,life,Make the moment 📸,,
-Start before you're ready.,en,motivation,Today is the day 🚀,,
-Let them go. The right ones never need to be chased.,en,sad,Stop chasing 🕊,,
-Someday your story will be someone else's reason to keep going.,en,inspiring,Your story matters 🌟,,
-Your energy introduces you before you even speak.,en,life,Protect your energy ✨,,
-Work hard in silence. Let your results make the noise.,en,motivation,Silent grind 🔥,,
-"Some people are lessons, not forever.",en,sad,"Lessons, not forever 📖",,
-Even the darkest night ends with a sunrise.,en,inspiring,Sunrise is coming 🌅,,
-Not everyone deserves a front-row seat in your life.,en,life,Choose your circle 🎟,,
-You don't need more time. You need more focus.,en,motivation,Focus mode 🎯,,
-I'm not cold. I just stopped explaining myself to people who chose to misunderstand.,en,sad,"Not cold, just done 🖤",,
-Believe in yourself before anyone else does.,en,inspiring,Believe first ✨,,
-"Happiness is found in small, quiet moments.",en,life,Small moments 🌼,,
-"A year from now, you'll wish you had started today.",en,motivation,Start today ⏳,,
-Don't shrink yourself to fit into someone's half-love.,en,sad,You deserve full love 🤍,,
-Slow progress is still progress. Keep going.,en,inspiring,Keep going 🌄,,
-Time is the one thing you can never earn back.,en,life,Spend it wisely ⏳,,
-The hardest goodbyes are the ones never said out loud.,en,sad,Unsaid goodbyes 🌙,,
-One day you'll be grateful they left.,en,sad,"One day, you'll see 🌤",,
-"Choose peace, even if it means being alone for a while.",en,sad,Choose peace 🕊,,
-You can't heal in the same place that broke you.,en,sad,Leave to heal 🌿,,
-Love that makes you doubt your worth isn't love.,en,sad,Know your worth 💫,,
-"I gave you my all, and you gave me lessons.",en,sad,All I got were lessons 📖,,
-Your worth doesn't drop because someone failed to see it.,en,sad,Your worth stays 💫,,
-Rain doesn't ask permission. Neither does missing someone.,en,sad,"Missing you, like rain 🌧",,
-The night knows the things I never told anyone.,en,sad,3 AM thoughts 🌙,,
-Some goodbyes don't happen in words. They happen in distance.,en,sad,Distance said goodbye 🌫,,
-I still care. I just stopped showing it.,en,sad,Quietly caring 🖤,,
-"It's strange how a stranger became everything, then a stranger again.",en,sad,From strangers to strangers 🥀,,
-I'm tired of being the only one who tries.,en,sad,Tired of trying 🌧,,
-Some people leave without leaving.,en,sad,"Here, but gone 🌙",,
-I smile so no one asks why I'm not okay.,en,sad,Behind the smile 🙂,,
-You were my favorite hello and my hardest goodbye.,en,sad,"Hello, goodbye 💔",,
-The worst feeling is knowing you were easy to replace.,en,sad,Easy to replace 🥀,,
-Overthinking is just the heart refusing to let go.,en,sad,3 AM overthinking 🌙,,
-Missing someone is love with nowhere to go.,en,sad,Love with nowhere to go 🕯,,
+text,lang,mood,heading,caption,posted_at,style
+Some silences hurt more than words ever could.,en,sad,Silence says what words can't 🌧,,2026-10-26 06:39 UTC,classic
+"Be a good person but,\nDon't waste your time proving it.",en,life,Read that again 🤍,,,minimal
+I didn't lose you.\nI lost the version of me\nthat kept begging\nyou to stay.,en,sad,The day I stopped begging 🖤,,,classic
+"The sun rises every day, no matter how dark the night was.",en,inspiring,Morning reminder ☀️,,,classic
+Comparison is the thief of joy.,en,life,Stop comparing 🌿,,,classic
+Nobody is coming to save you. Get up and save yourself.,en,motivation,Your wake-up call ⏰,,,classic
+Stop watering people who never let you grow.,en,sad,Read this twice 🌱,,,classic
+You've survived every bad day so far. You'll survive this one too.,en,inspiring,You're stronger than you think ✨,,,classic
+Not every closed door is locked. Some just need a push.,en,life,Push the door 🚪,,,classic
+Your future self is watching you right now. Make them proud.,en,motivation,Do it for future you 🔥,,,classic
+You weren't too much. They just weren't enough.,en,sad,For the ones who were 'too much' 🤍,,,classic
+Bloom where nobody expected you to grow.,en,inspiring,Bloom anyway 🌸,,,classic
+"The quieter you become, the more you can hear.",en,life,Listen to the silence 🍃,,,classic
+Small steps every day still count as moving forward.,en,motivation,"Progress, not perfection 👣",,,classic
+Healing is quiet. Nobody claps for it.,en,sad,Quiet healing 🕯,,,classic
+Your story isn't over. This is just a hard chapter.,en,inspiring,Keep turning the pages 📖,,,classic
+Be kind. Everyone is fighting a battle you know nothing about.,en,life,Just be kind 🤍,,,classic
+Be the person who didn't give up.,en,motivation,Don't quit 💪,,,classic
+I miss who I thought you were.,en,sad,Missing a version of you 🥀,,,classic
+Stars can't shine without darkness.,en,inspiring,Shine through it ⭐,,,classic
+Some people grow up. Some people just grow older.,en,life,"Grow, don't just age 🌱",,,classic
+Doubt kills more dreams than failure ever will.,en,motivation,Stop doubting yourself 🚀,,,classic
+Being ignored by someone you'd never ignore is its own kind of heartbreak.,en,sad,The heartbreak no one talks about 💔,,,classic
+You can be a masterpiece and a work in progress at the same time.,en,inspiring,"Both, always 🎨",,,classic
+Life is too short to wait for perfect moments. Make them.,en,life,Make the moment 📸,,,classic
+Start before you're ready.,en,motivation,Today is the day 🚀,,,classic
+Let them go. The right ones never need to be chased.,en,sad,Stop chasing 🕊,,,classic
+Someday your story will be someone else's reason to keep going.,en,inspiring,Your story matters 🌟,,,classic
+Your energy introduces you before you even speak.,en,life,Protect your energy ✨,,,classic
+Work hard in silence. Let your results make the noise.,en,motivation,Silent grind 🔥,,,classic
+"Some people are lessons, not forever.",en,sad,"Lessons, not forever 📖",,,classic
+Even the darkest night ends with a sunrise.,en,inspiring,Sunrise is coming 🌅,,,classic
+Not everyone deserves a front-row seat in your life.,en,life,Choose your circle 🎟,,,classic
+You don't need more time. You need more focus.,en,motivation,Focus mode 🎯,,,classic
+I'm not cold. I just stopped explaining myself to people who chose to misunderstand.,en,sad,"Not cold, just done 🖤",,,classic
+Believe in yourself before anyone else does.,en,inspiring,Believe first ✨,,,classic
+"Happiness is found in small, quiet moments.",en,life,Small moments 🌼,,,classic
+"A year from now, you'll wish you had started today.",en,motivation,Start today ⏳,,,classic
+Don't shrink yourself to fit into someone's half-love.,en,sad,You deserve full love 🤍,,,classic
+Slow progress is still progress. Keep going.,en,inspiring,Keep going 🌄,,,classic
+Time is the one thing you can never earn back.,en,life,Spend it wisely ⏳,,,classic
+The hardest goodbyes are the ones never said out loud.,en,sad,Unsaid goodbyes 🌙,,,classic
+One day you'll be grateful they left.,en,sad,"One day, you'll see 🌤",,,classic
+"Choose peace, even if it means being alone for a while.",en,sad,Choose peace 🕊,,,classic
+You can't heal in the same place that broke you.,en,sad,Leave to heal 🌿,,,classic
+Love that makes you doubt your worth isn't love.,en,sad,Know your worth 💫,,,classic
+"I gave you my all, and you gave me lessons.",en,sad,All I got were lessons 📖,,,classic
+Your worth doesn't drop because someone failed to see it.,en,sad,Your worth stays 💫,,,classic
+Rain doesn't ask permission. Neither does missing someone.,en,sad,"Missing you, like rain 🌧",,,classic
+The night knows the things I never told anyone.,en,sad,3 AM thoughts 🌙,,,classic
+Some goodbyes don't happen in words. They happen in distance.,en,sad,Distance said goodbye 🌫,,,classic
+I still care. I just stopped showing it.,en,sad,Quietly caring 🖤,,,classic
+"It's strange how a stranger became everything, then a stranger again.",en,sad,From strangers to strangers 🥀,,,classic
+I'm tired of being the only one who tries.,en,sad,Tired of trying 🌧,,,classic
+Some people leave without leaving.,en,sad,"Here, but gone 🌙",,,classic
+I smile so no one asks why I'm not okay.,en,sad,Behind the smile 🙂,,,classic
+You were my favorite hello and my hardest goodbye.,en,sad,"Hello, goodbye 💔",,,classic
+The worst feeling is knowing you were easy to replace.,en,sad,Easy to replace 🥀,,,classic
+Overthinking is just the heart refusing to let go.,en,sad,3 AM overthinking 🌙,,,classic
+Missing someone is love with nowhere to go.,en,sad,Love with nowhere to go 🕯,,,classic

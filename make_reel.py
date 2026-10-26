@@ -31,6 +31,7 @@ FONTS = {
     "te": ROOT / "fonts" / "NotoSansTelugu-Medium.ttf",
 }
 WATERMARK_FONT = ROOT / "fonts" / "NotoSerif-Italic.ttf"
+MINIMAL_FONT = ROOT / "fonts" / "Inter-Medium.otf"
 
 # Used when backgrounds/ is empty and AI_BACKGROUNDS=1.
 AI_STYLE = ("moody cinematic photo, dark, soft light, film grain, melancholic, "
@@ -139,6 +140,30 @@ def wrap(text, font, draw, max_width):
     return lines
 
 
+def minimal_layer(quote):
+    """Small left-aligned text with a thin red bar, like a film subtitle."""
+    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+    font = ImageFont.truetype(str(MINIMAL_FONT), 40)
+    lines = wrap(quote, font, draw, W * 0.62)
+    line_h = 54
+    block_w = max(draw.textlength(line, font=font) for line in lines)
+    x = int((W - block_w) / 2) + 14
+    top = int(H * 0.56)
+    shadow = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    sdraw = ImageDraw.Draw(shadow)
+    for k, line in enumerate(lines):
+        sdraw.text((x, top + k * line_h + 2), line, font=font, fill=(0, 0, 0, 220))
+        draw.text((x, top + k * line_h), line, font=font, fill=(250, 250, 250, 255))
+    layer = Image.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(4)), layer)
+    draw = ImageDraw.Draw(layer)
+    draw.rectangle([x - 16, top + 6, x - 11, top + len(lines) * line_h - 4], fill=(220, 38, 38, 255))
+    wfont = ImageFont.truetype(str(WATERMARK_FONT), 30)
+    wx = (W - draw.textlength(WATERMARK, font=wfont)) / 2
+    draw.text((wx, H - 260), WATERMARK, font=wfont, fill=(245, 240, 232, 150))
+    return layer
+
+
 def text_layer(quote, lang):
     """Transparent PNG with the quote centred and the watermark at the bottom."""
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -171,14 +196,23 @@ def text_layer(quote, lang):
     return layer
 
 
-def render(quote, out, lang="en", seed=None, bg=None, mood="sad", music=None):
+def soft_shade(img):
+    # Lighter grade for the minimal style: keep the photo, just calm the highlights.
+    return Image.blend(img, Image.new("RGB", (W, H), (0, 0, 0)), 0.25)
+
+
+def render(quote, out, lang="en", seed=None, bg=None, mood="sad", music=None, style="classic"):
     rng = random.Random(seed)
     exts = {".mp3", ".m4a", ".wav", ".aac"}
     music = music or pick(f"music/{'sad' if mood == 'sad' else 'uplifting'}", exts, rng) or pick("music", exts, rng)
     with tempfile.TemporaryDirectory() as tmp:
         bg_path, txt_path = Path(tmp) / "bg.png", Path(tmp) / "text.png"
-        darken(load_background(rng, bg)).save(bg_path)
-        text_layer(quote, lang).save(txt_path)
+        if style == "minimal":
+            soft_shade(load_background(rng, bg)).save(bg_path)
+            minimal_layer(quote).save(txt_path)
+        else:
+            darken(load_background(rng, bg)).save(bg_path)
+            text_layer(quote, lang).save(txt_path)
 
         frames = int(DURATION * FPS)
         video = (
@@ -215,5 +249,6 @@ if __name__ == "__main__":
     ap.add_argument("--bg", help="background image to use instead of backgrounds/")
     ap.add_argument("--mood", default="sad", help="sad, motivation, inspiring or life")
     ap.add_argument("--music", help="music file to use instead of music/")
+    ap.add_argument("--style", default="classic", choices=["classic", "minimal"])
     a = ap.parse_args()
-    render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg, a.mood, a.music)
+    render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg, a.mood, a.music, a.style)

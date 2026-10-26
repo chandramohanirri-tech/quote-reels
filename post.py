@@ -74,6 +74,7 @@ def main():
     row = rows[i]
     lang = row["lang"].strip() or "en"
     mood = row.get("mood", "").strip() or "sad"
+    style = row.get("style", "").strip() or "classic"
 
     # Today's background (made by Chandu in ChatGPT) goes in incoming/; it's used once.
     todays = sorted((ROOT / "incoming").glob("*.[jp][pn]g")) + sorted((ROOT / "incoming").glob("*.jpeg"))
@@ -86,7 +87,7 @@ def main():
     track = tracks[0] if tracks else None
 
     video = Path("reels") / f"{i + 1:03d}.mp4"
-    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood, music=track)
+    render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood, music=track, style=style)
     if os.environ.get("DRY_RUN") != "1":
         for f, folder in ((bg, "backgrounds"), (track, "music")):
             if f is not None:

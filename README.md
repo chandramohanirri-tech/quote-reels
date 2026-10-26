@@ -11,7 +11,7 @@ Posts one quote reel a day to @betweenyour.thoughts, for free, using GitHub Acti
 
 ## Adding things
 
-- **Quotes:** add rows to `quotes.csv`. `lang` is `en` or `te`. `mood` is `sad`, `motivation`, `inspiring` or `life`; it picks the music, call to action and hashtags. `heading` is the caption's first line. `caption` is optional; if it's empty, the quote is used. Write `\n` in the text for a line break.
+- **Quotes:** add rows to `quotes.csv`. `lang` is `en` or `te`. `mood` is `sad`, `motivation`, `inspiring` or `life`; it picks the music, call to action and hashtags. `heading` is the caption's first line. `style` is `classic` (big centred serif) or `minimal` (small text with a red bar). `caption` is optional; if it's empty, the quote is used. Write `\n` in the text for a line break.
 - **Backgrounds:** put the day's image in `incoming/`. The next run uses it once, then moves it to `backgrounds/used/`.
 - **Music:** `music/sad/` and `music/uplifting/` start with four piano tracks each made by `make_music.py` (original, copyright-free). Add royalty-free tracks (Pixabay Music, YouTube Audio Library) in `music/`. If the folder is empty, the reel is silent.
 
