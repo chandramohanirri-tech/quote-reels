@@ -157,7 +157,7 @@ def minimal_layer(quote):
     layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
     draw = ImageDraw.Draw(layer)
     font = ImageFont.truetype(str(MINIMAL_FONT), 40)
-    lines = wrap(quote, font, draw, W * 0.62)
+    lines = wrap(quote, font, draw, W * 0.8)
     line_h = 54
     block_w = max(draw.textlength(line, font=font) for line in lines)
     x = int((W - block_w) / 2) + 14
