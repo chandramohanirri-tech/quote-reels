@@ -19,7 +19,7 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 ROOT = Path(__file__).parent
 W, H = 1080, 1920
@@ -208,6 +208,29 @@ def text_layer(quote, lang):
     return layer
 
 
+def watermark_layer():
+    layer = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(layer)
+    wfont = ImageFont.truetype(str(WATERMARK_FONT), 30)
+    wx = (W - draw.textlength(WATERMARK, font=wfont)) / 2
+    draw.text((wx, H - 200), WATERMARK, font=wfont, fill=(245, 240, 232, 160))
+    return layer
+
+
+def fit_with_blur(path):
+    """Fit a finished post (any shape) into 9:16 without cropping it, over a blurred copy."""
+    img = ImageOps.exif_transpose(Image.open(path)).convert("RGB")
+    scale = max(W / img.width, H / img.height)
+    back = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+    left, top = (back.width - W) // 2, (back.height - H) // 2
+    back = back.crop((left, top, left + W, top + H)).filter(ImageFilter.GaussianBlur(40))
+    back = Image.blend(back, Image.new("RGB", (W, H), (0, 0, 0)), 0.35)
+    scale = min(W / img.width, H / img.height)
+    front = img.resize((round(img.width * scale), round(img.height * scale)), Image.LANCZOS)
+    back.paste(front, ((W - front.width) // 2, (H - front.height) // 2))
+    return back
+
+
 def soft_shade(img):
     # Lighter grade for the minimal style: keep the photo, just calm the highlights.
     return Image.blend(img, Image.new("RGB", (W, H), (0, 0, 0)), 0.25)
@@ -219,7 +242,11 @@ def render(quote, out, lang="en", seed=None, bg=None, mood="sad", music=None, st
     music = music or pick(f"music/{'sad' if mood == 'sad' else 'uplifting'}", exts, rng) or pick("music", exts, rng)
     with tempfile.TemporaryDirectory() as tmp:
         bg_path, txt_path = Path(tmp) / "bg.png", Path(tmp) / "text.png"
-        if style == "minimal":
+        if style == "finished":
+            # Chandu's own finished post: keep it as is, only add the watermark.
+            fit_with_blur(bg).save(bg_path)
+            watermark_layer().save(txt_path)
+        elif style == "minimal":
             soft_shade(load_background(rng, bg)).save(bg_path)
             minimal_layer(quote).save(txt_path)
         else:
@@ -261,6 +288,6 @@ if __name__ == "__main__":
     ap.add_argument("--bg", help="background image to use instead of backgrounds/")
     ap.add_argument("--mood", default="sad", help="sad, motivation, inspiring or life")
     ap.add_argument("--music", help="music file to use instead of music/")
-    ap.add_argument("--style", default="classic", choices=["classic", "minimal"])
+    ap.add_argument("--style", default="classic", choices=["classic", "minimal", "finished"])
     a = ap.parse_args()
     render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg, a.mood, a.music, a.style)
