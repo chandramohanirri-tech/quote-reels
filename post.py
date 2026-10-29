@@ -103,6 +103,8 @@ def main():
     # Optional track for today (e.g. picked by Chandu on Pixabay); also used once.
     tracks = [p for p in sorted((ROOT / "incoming").glob("*")) if p.suffix.lower() in {".mp3", ".m4a", ".wav"}]
     track = tracks[0] if tracks else None
+    if os.environ.get("SILENT") == "1":
+        track = False
 
     video = Path("reels") / f"{i + 1:03d}.mp4"
     render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood, music=track, style=style)
@@ -110,7 +112,7 @@ def main():
         if library_bg is not None:
             with BG_LOG.open("a", encoding="utf-8") as log:
                 log.write(f"{library_bg.relative_to(ROOT).as_posix()}\n")
-        for f, folder in ((bg if library_bg is None else None, "backgrounds"), (track, "music")):
+        for f, folder in ((bg if library_bg is None else None, "backgrounds"), (track or None, "music")):
             if f is not None:
                 used = ROOT / folder / "used" / f"{i + 1:03d}{f.suffix}"
                 used.parent.mkdir(parents=True, exist_ok=True)

@@ -7,6 +7,10 @@ on:
         description: "Only render the reel, don't post it"
         type: boolean
         default: true
+      silent:
+        description: "Post without music"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -27,6 +31,7 @@ jobs:
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
           REQUIRE_IMAGE: "1"
+          SILENT: ${{ inputs.silent && '1' || '0' }}
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run && '1' || '0' }}
         run: |
           git config user.name "reel-bot"

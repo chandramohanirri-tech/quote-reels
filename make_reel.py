@@ -239,7 +239,8 @@ def soft_shade(img):
 def render(quote, out, lang="en", seed=None, bg=None, mood="sad", music=None, style="classic"):
     rng = random.Random(seed)
     exts = {".mp3", ".m4a", ".wav", ".aac"}
-    music = music or pick(f"music/{'sad' if mood == 'sad' else 'uplifting'}", exts, rng) or pick("music", exts, rng)
+    # music=False means a silent reel.
+    music = None if music is False else music or pick(f"music/{'sad' if mood == 'sad' else 'uplifting'}", exts, rng) or pick("music", exts, rng)
     with tempfile.TemporaryDirectory() as tmp:
         bg_path, txt_path = Path(tmp) / "bg.png", Path(tmp) / "text.png"
         if style == "finished":
