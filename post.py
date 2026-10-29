@@ -8,6 +8,7 @@ Runs inside GitHub Actions. Needs env vars:
 import csv
 import json
 import os
+import random
 import subprocess
 import sys
 import time
@@ -63,6 +64,20 @@ def push(message):
     git("push")
 
 
+BG_LOG = ROOT / "backgrounds" / "used.txt"
+
+
+def pick_library_background(mood, seed):
+    """Next image from Chandu's bundle that fits the mood, without repeats until all are used."""
+    folder = ROOT / "backgrounds" / ("sad" if mood == "sad" else "bright")
+    images = sorted(p for p in folder.glob("*") if p.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp"})
+    if not images:
+        return None
+    used = set(BG_LOG.read_text(encoding="utf-8").split()) if BG_LOG.exists() else set()
+    fresh = [p for p in images if p.relative_to(ROOT).as_posix() not in used] or images
+    return random.Random(seed).choice(fresh)
+
+
 def main():
     with QUOTES.open(newline="", encoding="utf-8") as f:
         rows = list(csv.DictReader(f))
@@ -79,8 +94,11 @@ def main():
     # Today's background (made by Chandu in ChatGPT) goes in incoming/; it's used once.
     todays = sorted((ROOT / "incoming").glob("*.[jp][pn]g")) + sorted((ROOT / "incoming").glob("*.jpeg"))
     bg = todays[0] if todays else None
+    library_bg = None
+    if bg is None:
+        bg = library_bg = pick_library_background(mood, seed=i)
     if bg is None and os.environ.get("REQUIRE_IMAGE") == "1":
-        sys.exit("No image in incoming/ for today's reel.")
+        sys.exit("No image in incoming/ or backgrounds/ for today's reel.")
 
     # Optional track for today (e.g. picked by Chandu on Pixabay); also used once.
     tracks = [p for p in sorted((ROOT / "incoming").glob("*")) if p.suffix.lower() in {".mp3", ".m4a", ".wav"}]
@@ -89,7 +107,10 @@ def main():
     video = Path("reels") / f"{i + 1:03d}.mp4"
     render(row["text"].replace("\\n", "\n"), ROOT / video, lang, seed=i, bg=bg, mood=mood, music=track, style=style)
     if os.environ.get("DRY_RUN") != "1":
-        for f, folder in ((bg, "backgrounds"), (track, "music")):
+        if library_bg is not None:
+            with BG_LOG.open("a", encoding="utf-8") as log:
+                log.write(f"{library_bg.relative_to(ROOT).as_posix()}\n")
+        for f, folder in ((bg if library_bg is None else None, "backgrounds"), (track, "music")):
             if f is not None:
                 used = ROOT / folder / "used" / f"{i + 1:03d}{f.suffix}"
                 used.parent.mkdir(parents=True, exist_ok=True)
