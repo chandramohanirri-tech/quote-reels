@@ -2,7 +2,8 @@
 
 Runs inside GitHub Actions with the IG_TOKEN secret. What it does is set by dm/request.json:
     {"mode": "list"}
-    {"mode": "send", "text": "Hi!", "to": ["username1", "username2"]}
+    {"mode": "send", "text": "Hi!", "to": ["username1", "username2"], "reel": "<media id>"}
+"reel" is optional: one of the page's own posts, shared in the chat after the text.
 Instagram only allows a business reply within 24 hours of the person's last message,
 so "send" skips anyone outside that window. Message text is never printed.
 """
@@ -86,6 +87,11 @@ def main():
         res = call("POST", f"{me['user_id']}/messages",
                    body={"recipient": {"id": p["id"]}, "message": {"text": text}})
         print(f"SENT to @{name}: {res.get('message_id', res)}")
+        if req.get("reel"):
+            res = call("POST", f"{me['user_id']}/messages",
+                       body={"recipient": {"id": p["id"]},
+                             "message": {"attachment": {"type": "MEDIA_SHARE", "payload": {"id": req["reel"]}}}})
+            print(f"SENT reel to @{name}: {res.get('message_id', res)}")
 
 
 if __name__ == "__main__":
