@@ -243,10 +243,10 @@ def render(quote, out, lang="en", seed=None, bg=None, mood="sad", music=None, st
     music = None if music is False else music or pick(f"music/{'sad' if mood == 'sad' else 'uplifting'}", exts, rng) or pick("music", exts, rng)
     with tempfile.TemporaryDirectory() as tmp:
         bg_path, txt_path = Path(tmp) / "bg.png", Path(tmp) / "text.png"
-        if style == "finished":
-            # Chandu's own finished post: keep it as is, only add the watermark.
+        if style in ("finished", "asis"):
+            # Chandu's own finished post: keep it as is ("asis" already has the watermark).
             fit_with_blur(bg).save(bg_path)
-            watermark_layer().save(txt_path)
+            (watermark_layer() if style == "finished" else Image.new("RGBA", (W, H))).save(txt_path)
         elif style == "minimal":
             soft_shade(load_background(rng, bg)).save(bg_path)
             minimal_layer(quote).save(txt_path)
@@ -289,6 +289,6 @@ if __name__ == "__main__":
     ap.add_argument("--bg", help="background image to use instead of backgrounds/")
     ap.add_argument("--mood", default="sad", help="sad, motivation, inspiring or life")
     ap.add_argument("--music", help="music file to use instead of music/")
-    ap.add_argument("--style", default="classic", choices=["classic", "minimal", "finished"])
+    ap.add_argument("--style", default="classic", choices=["classic", "minimal", "finished", "asis"])
     a = ap.parse_args()
     render(a.quote.replace("\\n", "\n"), a.out, a.lang, a.seed, a.bg, a.mood, a.music, a.style)

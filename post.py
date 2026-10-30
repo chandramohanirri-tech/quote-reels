@@ -29,12 +29,14 @@ CTA = {
     "motivation": "Save this for the days you feel like giving up 💪",
     "inspiring": "Share this with someone who needs a little hope ✨",
     "life": "Save this and read it again in a year 📌",
+    "love": "Send this to the one who makes you smile 💛",
 }
 HASHTAGS = {
     "sad": "#sadquotes #heartbreak #selfworth #healing #deepthoughts",
     "motivation": "#motivation #motivationalquotes #discipline #selfgrowth #nevergiveup",
     "inspiring": "#inspiration #inspirationalquotes #hope #positivevibes #keepgoing",
     "life": "#lifequotes #lifelessons #wisdom #mindset #deepthoughts",
+    "love": "#lovequotes #romanticquotes #feelings #smile #deepthoughts",
 }
 TELUGU_TAGS = "#teluguquotes #telugu #telugumotivation"
 
