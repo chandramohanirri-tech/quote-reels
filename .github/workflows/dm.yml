@@ -1,0 +1,21 @@
+name: Instagram DMs
+
+# Runs when dm/request.json changes on the working branch. "list" only reads;
+# "send" messages the usernames in the file (only people who wrote in the last 24h).
+on:
+  push:
+    branches: [claude/project-thread-owtsjo]
+    paths: [dm/request.json, dm.py, .github/workflows/dm.yml]
+
+concurrency: instagram-dm
+
+jobs:
+  dm:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run
+        env:
+          IG_TOKEN: ${{ secrets.IG_TOKEN }}
+        run: python dm.py
