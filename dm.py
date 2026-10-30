@@ -80,6 +80,11 @@ def main():
         # Diagnostic: the same list through the account id, with only ids (no names or text).
         raw = call("GET", f"{me['user_id']}/conversations", platform="instagram", fields="updated_time")
         print(f"Check via account id: {len(raw.get('data', []))} conversations")
+        if req.get("subscribe"):
+            # Ask Instagram to route this account's messages to the app (needed by some setups).
+            print("Subscribe:", call("POST", f"{me['user_id']}/subscribed_apps", subscribed_fields="messages"))
+            people = conversations(me["user_id"])
+            print(f"After subscribing: {len(people)} conversations")
     print(f"{len(people)} conversations")
     for name, p in sorted(people.items(), key=lambda kv: hours_ago(kv[1]["last"]) or 1e9):
         h = hours_ago(p["last"])
