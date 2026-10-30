@@ -90,6 +90,13 @@ def facebook_login():
 
 def main():
     req = json.loads(REQUEST.read_text(encoding="utf-8"))
+    if req.get("mode") == "check_post":
+        # Read-only: needs the publishing permission, posts nothing.
+        check_token()
+        me = call("GET", "me", fields="user_id,username")
+        quota = call("GET", f"{me['user_id']}/content_publishing_limit", fields="quota_usage,config")
+        print(f"Account: @{me.get('username')} can publish. Posts in last 24h: {quota}")
+        return
     if os.environ.get("FB_TOKEN"):
         me, owner = facebook_login()
         people = conversations(me["user_id"], owner)
