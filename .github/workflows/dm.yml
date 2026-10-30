@@ -18,4 +18,5 @@ jobs:
       - name: Run
         env:
           IG_TOKEN: ${{ secrets.IG_TOKEN }}
+          FB_TOKEN: ${{ secrets.FB_TOKEN }}
         run: python dm.py

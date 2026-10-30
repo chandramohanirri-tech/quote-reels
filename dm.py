@@ -1,6 +1,7 @@
 """List recent Instagram DM conversations, or send one message to people who wrote in the last 24 hours.
 
-Runs inside GitHub Actions with the IG_TOKEN secret. What it does is set by dm/request.json:
+Runs inside GitHub Actions with the IG_TOKEN secret, or with FB_TOKEN (a Facebook user token
+for the Facebook Page linked to the Instagram account) when that secret is set. What it does is set by dm/request.json:
     {"mode": "list"}
     {"mode": "send", "text": "Hi!", "to": ["username1", "username2"], "reel": "<media id>"}
 "reel" is optional: one of the page's own posts, shared in the chat after the text.
@@ -16,11 +17,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 API = "https://graph.instagram.com/v23.0"
+TOKEN = os.environ.get("IG_TOKEN", "")
 REQUEST = Path(__file__).parent / "dm" / "request.json"
 
 
 def call(method, path, body=None, **params):
-    params["access_token"] = os.environ["IG_TOKEN"]
+    params["access_token"] = TOKEN
     url = f"{API}/{path}?{urllib.parse.urlencode(params)}"
     data = json.dumps(body).encode() if body is not None else None
     req = urllib.request.Request(url, data=data, method=method,
@@ -35,12 +37,12 @@ def call(method, path, body=None, **params):
         sys.exit(f"Instagram API error on {path}: {err}")
 
 
-def conversations(me):
+def conversations(me, owner="me"):
     """Everyone with a DM thread, with the time of their own latest message."""
     people, after = {}, None
     while True:
         extra = {"after": after} if after else {}
-        page = call("GET", "me/conversations", platform="instagram", limit=50,
+        page = call("GET", f"{owner}/conversations", platform="instagram", limit=50,
                     fields="participants,updated_time,messages.limit(25){from,created_time}", **extra)
         for conv in page.get("data", []):
             others = [p for p in conv.get("participants", {}).get("data", []) if p.get("id") != me]
@@ -65,18 +67,40 @@ def hours_ago(stamp):
 
 def check_token():
     """Describe the token's shape without revealing it, to spot paste mistakes."""
-    t = os.environ.get("IG_TOKEN", "")
+    t = TOKEN
     print(f"Token: {len(t)} chars, starts with {t[:2]!r}, "
           f"spaces/newlines: {any(c.isspace() for c in t)}, quotes: {any(c in t for c in '\"\'')}")
 
 
-def main():
+def facebook_login():
+    """Switch to the Facebook Graph API with the token of the Page linked to the Instagram account."""
+    global API, TOKEN
+    API, TOKEN = "https://graph.facebook.com/v23.0", os.environ["FB_TOKEN"]
     check_token()
+    pages = call("GET", "me/accounts", fields="name,access_token,instagram_business_account{id,username}")
+    print(f"Facebook Pages: {[p.get('name') for p in pages.get('data', [])]}")
+    for page in pages.get("data", []):
+        ig = page.get("instagram_business_account")
+        if ig:
+            TOKEN = page["access_token"]
+            print(f"Using Page '{page['name']}' linked to @{ig.get('username')}")
+            return {"user_id": ig["id"], "username": ig.get("username")}, page["id"]
+    sys.exit("No Facebook Page linked to an Instagram account was found for this token.")
+
+
+def main():
     req = json.loads(REQUEST.read_text(encoding="utf-8"))
-    me = call("GET", "me", fields="user_id,username")
+    if os.environ.get("FB_TOKEN"):
+        me, owner = facebook_login()
+        people = conversations(me["user_id"], owner)
+        sender = owner
+    else:
+        check_token()
+        me = call("GET", "me", fields="user_id,username")
+        owner, sender = "me", me["user_id"]
+        people = conversations(me["user_id"])
     print(f"Account: @{me.get('username')}")
-    people = conversations(me["user_id"])
-    if not people:
+    if not people and owner == "me":
         # Diagnostic: the same list through the account id, with only ids (no names or text).
         raw = call("GET", f"{me['user_id']}/conversations", platform="instagram", fields="updated_time")
         print(f"Check via account id: {len(raw.get('data', []))} conversations")
@@ -101,11 +125,11 @@ def main():
         if p is None or h is None or h >= 24:
             print(f"SKIPPED @{name}: no message from them in the last 24 hours")
             continue
-        res = call("POST", f"{me['user_id']}/messages",
+        res = call("POST", f"{sender}/messages",
                    body={"recipient": {"id": p["id"]}, "message": {"text": text}})
         print(f"SENT to @{name}: {res.get('message_id', res)}")
         if req.get("reel"):
-            res = call("POST", f"{me['user_id']}/messages",
+            res = call("POST", f"{sender}/messages",
                        body={"recipient": {"id": p["id"]},
                              "message": {"attachment": {"type": "MEDIA_SHARE", "payload": {"id": req["reel"]}}}})
             print(f"SENT reel to @{name}: {res.get('message_id', res)}")
