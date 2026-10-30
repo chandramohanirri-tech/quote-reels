@@ -63,7 +63,15 @@ def hours_ago(stamp):
     return (datetime.now(timezone.utc) - t).total_seconds() / 3600
 
 
+def check_token():
+    """Describe the token's shape without revealing it, to spot paste mistakes."""
+    t = os.environ.get("IG_TOKEN", "")
+    print(f"Token: {len(t)} chars, starts with {t[:2]!r}, "
+          f"spaces/newlines: {any(c.isspace() for c in t)}, quotes: {any(c in t for c in '\"\'')}")
+
+
 def main():
+    check_token()
     req = json.loads(REQUEST.read_text(encoding="utf-8"))
     me = call("GET", "me", fields="user_id,username")
     print(f"Account: @{me.get('username')}")
