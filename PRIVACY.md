@@ -21,7 +21,7 @@ This policy covers the small tool that runs the Instagram account **@betweenyour
 Nothing is stored after a run finishes. Data is fetched from Instagram when needed and discarded afterwards. The access token is kept as an encrypted secret.
 
 ## Your choices
-You can stop all messages by blocking or restricting @betweenyour.thoughts on Instagram, or by asking us to delete any data: DM @betweenyour.thoughts or email chandramohanirri@gmail.com. Deletion requests are handled within 7 days.
+You can stop all messages by blocking or restricting @betweenyour.thoughts on Instagram, or by asking us to delete any data: DM @betweenyour.thoughts. Deletion requests are handled within 7 days.
 
 ## Contact
-chandramohanirri@gmail.com
+Send a direct message to @betweenyour.thoughts on Instagram.
