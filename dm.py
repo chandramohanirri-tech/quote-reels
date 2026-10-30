@@ -76,6 +76,10 @@ def main():
     me = call("GET", "me", fields="user_id,username")
     print(f"Account: @{me.get('username')}")
     people = conversations(me["user_id"])
+    if not people:
+        # Diagnostic: the same list through the account id, with only ids (no names or text).
+        raw = call("GET", f"{me['user_id']}/conversations", platform="instagram", fields="updated_time")
+        print(f"Check via account id: {len(raw.get('data', []))} conversations")
     print(f"{len(people)} conversations")
     for name, p in sorted(people.items(), key=lambda kv: hours_ago(kv[1]["last"]) or 1e9):
         h = hours_ago(p["last"])
